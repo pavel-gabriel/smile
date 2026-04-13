@@ -34,7 +34,7 @@ _none_
 - [ ] [feat] Admin — CSV bulk import
   - Done when: valid CSV adds all rows; invalid rows reported; format `text,author`
 
-- [ ] [feat] Admin — settings panel
+- [x] [feat] Admin — settings panel
   - Done when: Facebook credentials + posting toggle save to `settings` table
 
 - [ ] [feat] Unsplash background per phrase
@@ -68,6 +68,7 @@ _none_
 | [feat] Admin auth | 2026-04-14 |
 | [feat] Admin — phrase list + delete + reorder | 2026-04-14 |
 | [feat] Admin — single phrase entry | 2026-04-14 |
+| [feat] Admin — settings panel | 2026-04-14 |
 
 ## Tags
 `[setup]` scaffold/config · `[feat]` feature · `[fix]` bug · `[refactor]` internal · `[test]` tests · `[infra]` deploy/CI · `[chore]` maintenance

@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabase";
-import { addPhrase, deletePhrase, movePhraseUp, movePhraseDown } from "./actions";
+import { addPhrase, movePhraseUp, movePhraseDown } from "./actions";
+import DeleteButton from "./DeleteButton";
 
 export const dynamic = "force-dynamic";
 
@@ -81,20 +82,7 @@ export default async function PhrasesPage() {
                             </form>
                           </>
                         )}
-                        <form
-                          action={deletePhrase.bind(null, phrase.id)}
-                          onSubmit={(e) => {
-                            if (!confirm("Delete this phrase?")) e.preventDefault();
-                          }}
-                        >
-                          <button
-                            type="submit"
-                            title="Delete"
-                            className="text-neutral-600 transition hover:text-red-400"
-                          >
-                            ✕
-                          </button>
-                        </form>
+                        <DeleteButton phraseId={phrase.id} />
                       </div>
                     </td>
                   </tr>
