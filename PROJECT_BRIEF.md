@@ -1,95 +1,34 @@
-# Project Brief
+# Project Brief — Smile
 
-> Fill this out before creating a spec or writing any code. A clear brief prevents wasted work.
+**What:** Web app showing one uplifting phrase per day. Visitors smile. Admin manages content.
+**Budget:** $0/month (free tiers only)
+**Owner:** Solo project, one admin
 
----
+## Stack
+Next.js (App Router) · Vercel · Supabase (Postgres + Auth) · Unsplash API · Facebook Graph API
 
-## Project Name
+## Scope — In
+- One phrase/day, auto-rotates at midnight (UTC)
+- Background image per phrase via Unsplash keyword search (URL cached in DB)
+- Admin panel: phrase list, single-add (text box), CSV bulk import, settings
+- Facebook page auto-post on phrase change (via Vercel Cron)
 
-_Name of this project._
-
-## One-Line Summary
-
-_What this does, in one sentence._
-
----
-
-## Problem
-
-_What problem does this solve? Who has this problem? How do they currently deal with it?_
-
----
-
-## Goal
-
-_What does success look like? What changes when this is built?_
-
----
+## Scope — Out
+- User accounts, comments, social features on site
+- AI-generated images (backlog)
+- Mobile app (v2)
+- Multi-language
 
 ## Users
-
-| User type | Primary need |
-|-----------|-------------|
-| | |
-
----
-
-## Scope
-
-### In scope
-
-- 
-
-### Out of scope
-
-- 
-
----
-
-## Constraints
-
-| Type | Detail |
-|------|--------|
-| Timeline | |
-| Budget | |
-| Tech stack | |
-| Compliance | |
-| Team | |
-
----
-
-## Success Metrics
-
-_How will you measure whether this worked?_
-
-- 
-
----
-
-## Assumptions
-
-_What are you assuming is true? These should be validated before or during the project._
-
-- 
-
----
+| Type | Need |
+|------|------|
+| Visitor | See today's phrase + background |
+| Admin | Manage phrases, configure Facebook, monitor stock |
 
 ## Risks
-
-| Risk | Likelihood (H/M/L) | Impact | Mitigation |
-|------|-------------------|--------|------------|
-| | | | |
-
----
-
-## Reference Material
-
-_Links, research, prior art, Perplexity exports, competitor analysis._
-
-- 
-
----
-
-## Spec
-
-Once this brief is approved, the next step is to create a spec under `specs/`. Use Spec Kit or a manual spec process based on this brief.
+| Risk | Mitigation |
+|------|-----------|
+| Unsplash rate limit (50 req/h) | Cache URL in DB — 1 call per phrase ever |
+| Facebook token expiry (~60d) | Manual refresh in settings panel |
+| Phrase bank depletion | Low-stock warning (backlog) |
+| Supabase free tier pauses after 7d inactivity | Any visit wakes it; acceptable for v1 |

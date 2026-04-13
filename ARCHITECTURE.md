@@ -1,113 +1,69 @@
-# Architecture
+# Architecture — Smile
 
-> Document the system design here. Update when significant changes are made. Reference `DECISIONS.md` for the rationale behind key choices.
-
----
-
-## Overview
-
-_One paragraph. What does this system do and how is it structured at a high level?_
-
----
-
-## System Diagram
-
+## Diagram
 ```
-[Replace with ASCII diagram, Mermaid block, or embed a diagram file]
-
-Example:
-
-┌────────────┐      ┌──────────────┐      ┌──────────┐
-│   Client   │ ───▶ │   API Layer  │ ───▶ │    DB    │
-└────────────┘      └──────────────┘      └──────────┘
+Visitor/Admin ──▶ Vercel (Next.js App Router)
+                      ├── / (public, ISR)
+                      ├── /admin (Supabase Auth)
+                      └── /api/*
+                              ├──▶ Supabase (Postgres + Auth)
+                              ├──▶ Unsplash API (backgrounds)
+                              └──▶ Facebook Graph API (daily post)
+Vercel Cron (00:00 UTC) ──▶ /api/cron/daily
 ```
-
----
 
 ## Components
-
-| Component | Responsibility | Technology | Location |
-|-----------|---------------|------------|----------|
-| | | | |
-
----
-
-## Key Data Flows
-
-### Flow 1: [Name]
-
-1. 
-2. 
-3. 
-
----
+| Component | Tech | Path |
+|-----------|------|------|
+| Public page | Next.js server component, ISR | `src/app/page.tsx` |
+| Admin panel | Next.js + Supabase Auth | `src/app/admin/` |
+| Phrase API | Next.js API route | `src/app/api/phrase/` |
+| Admin API | Next.js API routes | `src/app/api/admin/` |
+| Cron handler | Next.js API route | `src/app/api/cron/daily/` |
+| DB client | Supabase JS | `src/lib/supabase.ts` |
+| Unsplash client | Unsplash JS SDK | `src/lib/unsplash.ts` |
+| Facebook client | fetch + Graph API | `src/lib/facebook.ts` |
 
 ## Data Model
-
-_List key entities and their fields. Keep this at a logical level, not a migration file._
-
 ```
-Entity: User
-  - id: uuid (PK)
-  - email: string (unique)
-  - created_at: timestamp
-
-Entity: [Next]
-  - id: uuid
-  - ...
+phrases           id uuid PK, text, author?, keywords text[], background_url?, queue_position int, used_at timestamp?, created_at
+daily_selections  id uuid PK, date date UNIQUE, phrase_id uuid FK, created_at
+settings          key text PK, value text, updated_at
 ```
 
----
+Settings keys: `facebook_page_id`, `facebook_access_token`, `posting_enabled`, `timezone`
 
-## Authentication & Authorization
+## Key Flows
 
-_How is auth handled? What roles exist? What are the trust boundaries?_
+**Visitor loads page**
+1. Next.js fetches today's row from `daily_selections` → joins `phrases`
+2. If `background_url` is null → Unsplash query by keywords → cache URL in DB
+3. Render phrase + background; ISR revalidates at midnight
 
----
+**Cron fires (00:00 UTC)**
+1. Pick next phrase by `queue_position` where `used_at` is null
+2. Insert into `daily_selections` (idempotent — skip if date exists)
+3. Call Facebook Graph API to post; log errors, do not block
+
+**Admin adds phrases**
+- Single: form → `POST /api/admin/phrases`
+- Bulk: CSV parsed client-side → `POST /api/admin/phrases/bulk`
+
+## Auth
+- Visitors: no auth
+- Admin: Supabase Auth (email/password, single user)
+- Cron endpoint: `Authorization: Bearer $CRON_SECRET` header
 
 ## Infrastructure
+| Resource | Provider | Notes |
+|----------|----------|-------|
+| Hosting + Functions | Vercel free | Serverless, external calls allowed |
+| Database + Auth | Supabase free | 500MB, pauses after 7d inactivity |
+| Backgrounds | Unsplash free | 50 req/h; mitigated by DB cache |
+| Cron | Vercel free | 1 job — `vercel.json` |
+| Secrets | Vercel env vars | |
 
-| Resource | Provider/Tool | Configuration notes |
-|----------|--------------|-------------------|
-| Compute | | |
-| Database | | |
-| Storage | | |
-| CDN | | |
-| CI/CD | | |
-| Secrets | | |
-
----
-
-## External Services
-
-| Service | Purpose | Failure mode |
-|---------|---------|--------------|
-| | | |
-
----
-
-## Non-Functional Requirements
-
-| Concern | Approach |
-|---------|---------|
-| Performance | |
-| Scalability | |
-| Reliability | |
-| Observability | |
-| Security | |
-
----
-
-## Known Limitations
-
-_Technical debt, scale limits, or design compromises made deliberately._
-
-- 
-
----
-
-## Change Log
-
-| Date | Change | Decision ref |
-|------|--------|-------------|
-| | | |
+## Limitations
+- Midnight reset is UTC only (v1)
+- Facebook token expires ~60d — manual refresh required
+- Supabase project pauses after 7 days with no traffic

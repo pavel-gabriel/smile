@@ -1,65 +1,73 @@
 # Tasks
 
-> This is the implementation task list. Claude Code reads this at the start of every session.
-> 
-> **Format rules:**
-> - Tasks are ordered by priority, top to bottom.
-> - Each task has context and acceptance criteria.
-> - When a task is done, mark it `[x]` and add the completion date.
-> - When a task is in progress, note it with `[~]`.
-> - New tasks discovered during work go in the Backlog section.
+> Priority order top to bottom. `[~]` = in progress, `[x]` = done.
+> Add discovered tasks to Backlog. Mark done with date.
 
 ---
 
 ## In Progress
+_none_
 
-- [~] [setup] Initialize project structure
-  - Context: First task, establishes the foundation.
-  - Acceptance: Repo is initialized, dependencies installed, app runs locally.
-  - Deps: none
+## Queue
 
----
+- [x] [setup] Init Next.js + TypeScript + Tailwind
+  - Done when: `next dev` runs, TS compiles, Tailwind works
 
-## Queue (prioritized)
+- [x] [setup] Supabase schema + client wiring
+  - Done when: 3 tables exist, client queries from local dev, `.env.example` documented
 
-- [ ] [feat] 
-  - Context: 
-  - Acceptance: 
-  - Deps: 
+- [x] [feat] Public phrase display page (`/`)
+  - Done when: today's phrase + background renders; fallback shown if no phrase; ISR revalidates at midnight
 
----
+- [x] [feat] Daily phrase selection logic
+  - Done when: phrase advances each day by queue position; same phrase all day; idempotent re-runs
 
-## Backlog (not yet scheduled)
+- [x] [feat] Admin auth (`/admin/login`)
+  - Done when: login/logout work; unauthenticated requests redirected
 
-- [ ] 
+- [x] [feat] Admin — phrase list + delete + reorder
+  - Done when: all phrases listed; delete removes from DB; reorder updates queue positions
 
----
+- [x] [feat] Admin — single phrase entry (text box)
+  - Done when: form adds phrase to end of queue; success/error shown
+
+- [ ] [feat] Admin — CSV bulk import
+  - Done when: valid CSV adds all rows; invalid rows reported; format `text,author`
+
+- [ ] [feat] Admin — settings panel
+  - Done when: Facebook credentials + posting toggle save to `settings` table
+
+- [ ] [feat] Unsplash background per phrase
+  - Done when: each phrase has unique background; URL cached in DB; graceful gradient fallback
+
+- [ ] [feat] Facebook auto-post via cron
+  - Done when: cron posts phrase to Facebook page; failure logged but doesn't block rotation
+
+- [ ] [infra] Deploy to Vercel + configure cron
+  - Done when: prod URL works; cron active; env vars set; Supabase prod connected
+
+## Backlog
+- [ ] Timezone-aware midnight reset (currently UTC)
+- [ ] Facebook token auto-refresh before 60d expiry
+- [ ] Low phrase stock warning in admin (< 7 unused)
+- [ ] AI-generated backgrounds (Replicate/fal.ai) as Unsplash upgrade
+- [ ] Mobile app (v2)
+- [ ] Per-phrase visit analytics
 
 ## Blocked
-
 | Task | Blocker | Since |
 |------|---------|-------|
-| | | |
-
----
 
 ## Completed
+| Task | Date |
+|------|------|
+| [setup] Init Next.js + TypeScript + Tailwind | 2026-04-13 |
+| [setup] Supabase schema + client wiring | 2026-04-14 |
+| [feat] Public phrase display page | 2026-04-14 |
+| [feat] Daily phrase selection logic | 2026-04-14 |
+| [feat] Admin auth | 2026-04-14 |
+| [feat] Admin — phrase list + delete + reorder | 2026-04-14 |
+| [feat] Admin — single phrase entry | 2026-04-14 |
 
-| Task | Completed |
-|------|-----------|
-| [setup] Initialize project structure | |
-
----
-
-## Tag Reference
-
-| Tag | Meaning |
-|-----|---------|
-| `[setup]` | Project scaffolding, config, tooling |
-| `[feat]` | New user-facing feature |
-| `[fix]` | Bug fix |
-| `[refactor]` | Internal code improvement, no behavior change |
-| `[test]` | Tests, coverage, fixtures |
-| `[docs]` | Documentation |
-| `[infra]` | Infra, CI/CD, deployment |
-| `[chore]` | Maintenance, dependency updates |
+## Tags
+`[setup]` scaffold/config · `[feat]` feature · `[fix]` bug · `[refactor]` internal · `[test]` tests · `[infra]` deploy/CI · `[chore]` maintenance

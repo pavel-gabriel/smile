@@ -8,10 +8,10 @@ Read this file completely at the start of every session. These rules are not opt
 
 Before writing any code, do all of the following in order:
 
-1. **Read `PROJECT_BRIEF.md`** — understand what this project is and why it exists.
-2. **Read `TASKS.md`** — identify the current task queue and the first incomplete item.
-3. **Read `ARCHITECTURE.md`** — understand the system structure before touching anything.
-4. **Read `DECISIONS.md`** — know what has already been decided and why.
+1. **Read `TASKS.md`** — identify the current task queue and the first incomplete item.
+2. **Read `ARCHITECTURE.md`** — understand the system structure before touching anything.
+3. **Read `DECISIONS.md`** — know what has already been decided and why.
+4. **Read `PROJECT_BRIEF.md`** only if the task touches scope, users, or constraints.
 5. **State your plan** — describe what you intend to do this session and which task you'll tackle first.
 6. **Wait for confirmation** — do not start editing until the user confirms the plan.
 
