@@ -6,7 +6,7 @@
 ---
 
 ## In Progress
-_none_
+- [~] [infra] Deploy to Vercel + configure cron — code-ready, awaiting owner accounts/secrets (see `docs/deployment.md`)
 
 ## Queue
 
@@ -31,20 +31,21 @@ _none_
 - [x] [feat] Admin — single phrase entry (text box)
   - Done when: form adds phrase to end of queue; success/error shown
 
-- [ ] [feat] Admin — CSV bulk import
+- [x] [feat] Admin — CSV bulk import
   - Done when: valid CSV adds all rows; invalid rows reported; format `text,author`
 
 - [x] [feat] Admin — settings panel
   - Done when: Facebook credentials + posting toggle save to `settings` table
 
-- [ ] [feat] Unsplash background per phrase
+- [x] [feat] Unsplash background per phrase
   - Done when: each phrase has unique background; URL cached in DB; graceful gradient fallback
 
-- [ ] [feat] Facebook auto-post via cron
+- [x] [feat] Facebook auto-post via cron
   - Done when: cron posts phrase to Facebook page; failure logged but doesn't block rotation
 
-- [ ] [infra] Deploy to Vercel + configure cron
+- [~] [infra] Deploy to Vercel + configure cron
   - Done when: prod URL works; cron active; env vars set; Supabase prod connected
+  - Code-ready; requires owner action (accounts/secrets). Runbook + schema: `docs/deployment.md`
 
 ## Backlog
 - [ ] Timezone-aware midnight reset (currently UTC)
@@ -69,6 +70,9 @@ _none_
 | [feat] Admin — phrase list + delete + reorder | 2026-04-14 |
 | [feat] Admin — single phrase entry | 2026-04-14 |
 | [feat] Admin — settings panel | 2026-04-14 |
+| [feat] Admin — CSV bulk import | 2026-06-21 |
+| [feat] Unsplash background per phrase | 2026-06-21 |
+| [feat] Facebook auto-post via cron | 2026-06-21 |
 
 ## Tags
 `[setup]` scaffold/config · `[feat]` feature · `[fix]` bug · `[refactor]` internal · `[test]` tests · `[infra]` deploy/CI · `[chore]` maintenance
