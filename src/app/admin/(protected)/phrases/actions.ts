@@ -2,6 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { supabaseAdmin } from "@/lib/supabase";
+import { parsePhrasesCsv } from "@/lib/csv";
+
+export type CsvImportState = {
+  added: number;
+  errors: string[];
+} | null;
 
 export async function addPhrase(formData: FormData) {
   const text = (formData.get("text") as string)?.trim();
@@ -26,6 +32,45 @@ export async function addPhrase(formData: FormData) {
   });
 
   revalidatePath("/admin/phrases");
+}
+
+// Bulk import phrases from pasted CSV (format: text,author). Valid rows are
+// appended to the end of the queue; invalid rows are reported, not inserted.
+export async function importPhrasesCsv(
+  _prev: CsvImportState,
+  formData: FormData
+): Promise<CsvImportState> {
+  const csv = (formData.get("csv") as string) ?? "";
+  const { rows, errors } = parsePhrasesCsv(csv);
+
+  if (rows.length === 0) {
+    return { added: 0, errors: errors.length ? errors : ["No valid rows found"] };
+  }
+
+  // Determine the current end of the queue, then assign sequential positions.
+  const { data: last } = await supabaseAdmin
+    .from("phrases")
+    .select("queue_position")
+    .order("queue_position", { ascending: false })
+    .limit(1)
+    .single();
+
+  let nextPosition = (last?.queue_position ?? 0) + 1;
+
+  const toInsert = rows.map((r) => ({
+    text: r.text,
+    author: r.author,
+    queue_position: nextPosition++,
+  }));
+
+  const { error } = await supabaseAdmin.from("phrases").insert(toInsert);
+
+  if (error) {
+    return { added: 0, errors: [...errors, error.message] };
+  }
+
+  revalidatePath("/admin/phrases");
+  return { added: toInsert.length, errors };
 }
 
 export async function deletePhrase(phraseId: string) {

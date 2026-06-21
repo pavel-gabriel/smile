@@ -46,3 +46,44 @@ Alternative: date-index (`days_since_epoch % count`). Rejected — adding/removi
 Long-lived page tokens expire ~60d. Auto-refresh requires OAuth callback + scheduled refresh job — too complex for v1. Admin refreshes manually in settings panel. Facebook failure is logged but never blocks phrase rotation.
 
 **Consequences:** Admin must refresh token every ~60 days. Auto-refresh is a backlog item.
+
+---
+
+### DEC-006 — Unsplash & Facebook via `fetch`, not SDKs
+**Date:** 2026-06-21 | **Status:** Accepted
+
+`ARCHITECTURE.md` listed an "Unsplash JS SDK" and a Facebook client. Both
+integrations are a single HTTP call each, so they were implemented with the
+built-in `fetch` (`src/lib/unsplash.ts`, `src/lib/facebook.ts`) rather than
+adding npm dependencies. Keeps the dependency surface minimal and consistent.
+
+**Consequences:** No SDK conveniences (typed responses, retries). Each client
+returns a tagged result and never throws, so callers degrade gracefully.
+
+---
+
+### DEC-007 — Backgrounds fetched at selection time, not first visitor render
+**Date:** 2026-06-21 | **Status:** Accepted
+
+The architecture sketched fetching the Unsplash background lazily on the first
+visitor render. Instead, the background is fetched and cached when a phrase is
+chosen for the day inside `selectTodaysPhrase` (cron path). This avoids an
+Unsplash call during the ISR-cached public render and guarantees the URL is
+ready before traffic arrives. The public page keeps the gradient fallback for
+any phrase whose `background_url` is still null.
+
+**Consequences:** If the cron-time fetch fails, the day shows the gradient
+fallback rather than retrying on visit. Acceptable for v1.
+
+---
+
+### DEC-008 — Tests via Node's built-in runner
+**Date:** 2026-06-21 | **Status:** Accepted
+
+`npm test` runs `node --test` over `tests/**/*.test.ts` using Node 22's native
+type stripping — no Jest/Vitest dependency. Suits the current need (pure-logic
+unit tests, e.g. CSV parsing). Integration paths that need a live DB / external
+APIs are covered by `next build` + typecheck for now.
+
+**Consequences:** Limited to runtime-strippable TS and no rich mocking. Revisit
+if integration/e2e coverage becomes necessary.

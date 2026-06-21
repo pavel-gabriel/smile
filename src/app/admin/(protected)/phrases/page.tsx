@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "@/lib/supabase";
 import { addPhrase, movePhraseUp, movePhraseDown } from "./actions";
 import DeleteButton from "./DeleteButton";
+import CsvImport from "./CsvImport";
 
 export const dynamic = "force-dynamic";
 
@@ -120,6 +121,9 @@ export default async function PhrasesPage() {
           </div>
         </form>
       </div>
+
+      {/* Bulk import */}
+      <CsvImport />
     </div>
   );
 }
