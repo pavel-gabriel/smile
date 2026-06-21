@@ -1,50 +1,58 @@
-# Project Template
+# Smile
 
-This is the canonical starting point for every new project in this workspace.
+A tiny web app that shows **one uplifting phrase per day**, on a calm full-screen
+background. Visitors come, read today's phrase, and smile. A single admin manages
+the phrase queue and integrations.
 
-## How to use
+Built to run entirely on free tiers ($0/month).
 
-1. Copy this entire folder to a new location:
-   ```bash
-   cp -r project-template/ ~/projects/my-new-project
-   cd ~/projects/my-new-project
-   git init
-   ```
+## How it works
 
-2. Fill in `PROJECT_BRIEF.md` first. Do not start coding until the brief is clear.
+- **Public page (`/`)** — shows today's phrase over an Unsplash background, with a
+  gradient fallback. Server-rendered with ISR.
+- **Daily rotation** — a Vercel Cron job hits `/api/cron/daily` at 00:00 UTC,
+  picks the next phrase by queue position, caches its background, and (optionally)
+  posts it to a Facebook page. Idempotent — safe to re-run.
+- **Admin panel (`/admin`)** — Supabase-authenticated. Add phrases one at a time
+  or via CSV bulk import, reorder/delete the queue, and configure Facebook posting.
 
-3. Run your spec tool (Spec Kit or equivalent) and put outputs in `specs/`.
+## Stack
 
-4. Update `ARCHITECTURE.md` with the system design from the spec.
+Next.js (App Router) · Vercel · Supabase (Postgres + Auth) · Unsplash API ·
+Facebook Graph API. No SDKs beyond Supabase — external APIs are called with `fetch`.
 
-5. Populate `TASKS.md` from the spec's task breakdown.
+## Local development
 
-6. Open Claude Code, point it at this folder, and start with `CLAUDE.md`.
+```bash
+npm install
+cp .env.example .env.local   # fill in Supabase + Unsplash keys
+npm run dev                  # http://localhost:3000
+```
 
-## File Purposes
+Other scripts:
+
+```bash
+npm run build   # production build
+npm test        # unit tests (Node's built-in runner)
+npm run lint
+```
+
+## Deployment
+
+This app needs a host that runs Next.js server code (SSR + API route + cron) —
+**GitHub Pages will not work** (it's static-only; see `DECISIONS.md` DEC-001).
+Deploy to Vercel.
+
+The full step-by-step — Supabase schema SQL, every environment variable, cron
+setup, and post-deploy verification — lives in
+[`docs/deployment.md`](docs/deployment.md).
+
+## Project docs
 
 | File | Purpose |
 |------|---------|
-| `CLAUDE.md` | Instructions for Claude Code — read first, every session |
-| `PROJECT_BRIEF.md` | Goals, scope, constraints, success criteria |
-| `ARCHITECTURE.md` | System design, components, data model, infra |
-| `TASKS.md` | Ordered task list with context and acceptance criteria |
-| `DECISIONS.md` | Architectural and process decisions with rationale |
-| `specs/` | Spec Kit outputs, user stories, acceptance tests |
-| `docs/` | Internal docs, handoff notes, runbooks |
-| `src/` | Source code |
-| `tests/` | Test files |
-
-## Naming convention for the repo
-
-Use lowercase kebab-case: `my-project-name`
-
-## Git setup
-
-After copying, initialize the repo and make an initial commit:
-
-```bash
-git init
-git add .
-git commit -m "chore: init project from workspace template"
-```
+| `PROJECT_BRIEF.md` | Goals, scope, constraints |
+| `ARCHITECTURE.md` | System design, data model, infrastructure |
+| `DECISIONS.md` | Key decisions and their rationale |
+| `TASKS.md` | Task queue and status |
+| `docs/deployment.md` | Deployment runbook |
